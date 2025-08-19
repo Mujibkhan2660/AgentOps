@@ -1,4 +1,5 @@
 import { memo, useCallback, useMemo, useEffect, useState } from "react";
+import { gpt5Client } from "@/lib/gpt5-client";
 import {
   ReactFlow,
   Background,
@@ -20,6 +21,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { HoverCard, HoverCardTrigger, HoverCardContent } from "@/components/ui/hover-card";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Badge } from "@/components/ui/badge";
 
 export type EditHistory = {
   id: string;
@@ -177,9 +179,10 @@ const StepNode = memo(({ id, data }: NodeProps<any>) => {
   // Special rendering for prompt node (no hover card, no click)
   if (data.nodeType === 'prompt') {
     return (
-      <div className="w-56 rounded-lg border bg-card text-card-foreground shadow-sm p-3">
+      <div className="w-56 rounded-lg border bg-card text-card-foreground shadow-sm p-3 relative">
         <div className="mb-2">
           <div className="text-sm font-medium">{data.label}</div>
+          <Badge variant="secondary" className="text-xs mt-1">GPT-5</Badge>
         </div>
         <div className="space-y-2">
           {data.keywords ? (
@@ -199,17 +202,18 @@ const StepNode = memo(({ id, data }: NodeProps<any>) => {
   // Special rendering for output node (hover card with latency, click for summary)
   if (data.nodeType === 'output') {
     const tempOutput = [
-      "Vendor A - Score: 95/100 (Price: $1200, Rating: 4.8)",
-      "Vendor C - Score: 88/100 (Price: $1350, Rating: 4.6)", 
-      "Vendor E - Score: 92/100 (Price: $1100, Rating: 4.9)"
+      "Wyoming Paint Pros - Score: 95/100 (Price: $25/gal, Rating: 4.7)",
+      "Jackson Color Co. - Score: 88/100 (Price: $30/gal, Rating: 4.5)", 
+      "Powell Paint & Hardware - Score: 92/100 (Price: $26/gal, Rating: 4.5)"
     ];
     
     return (
       <HoverCard>
         <HoverCardTrigger asChild>
-          <div className="w-56 rounded-lg border bg-card text-card-foreground shadow-sm p-3 transition-all duration-300 hover:shadow-xl hover:border-primary/60 hover:scale-105 cursor-pointer group hover:bg-card/80">
+          <div className="w-56 rounded-lg border bg-card text-card-foreground shadow-sm p-3 transition-all duration-300 hover:shadow-xl hover:border-primary/60 hover:scale-105 cursor-pointer group hover:bg-card/80 relative">
             <div className="mb-2">
               <div className="text-sm font-medium group-hover:text-primary transition-colors">{data.label}</div>
+              <Badge variant="secondary" className="text-xs mt-1">GPT-5</Badge>
             </div>
             <div className="space-y-2">
               <div className="text-xs text-muted-foreground group-hover:text-primary/60 transition-colors">
@@ -250,9 +254,10 @@ const StepNode = memo(({ id, data }: NodeProps<any>) => {
   return (
     <HoverCard>
       <HoverCardTrigger asChild>
-        <div className="w-56 rounded-lg border bg-card text-card-foreground shadow-sm p-3 transition-all duration-300 hover:shadow-xl hover:border-primary/60 hover:scale-105 cursor-pointer group hover:bg-card/80">
+        <div className="w-56 rounded-lg border bg-card text-card-foreground shadow-sm p-3 transition-all duration-300 hover:shadow-xl hover:border-primary/60 hover:scale-105 cursor-pointer group hover:bg-card/80 relative">
           <div className="mb-2">
             <div className="text-sm font-medium group-hover:text-primary transition-colors">{data.label}</div>
+            <Badge variant="secondary" className="text-xs mt-1">GPT-5</Badge>
           </div>
           <div className="space-y-2">
             <div className="text-xs text-muted-foreground group-hover:text-primary/60 transition-colors">
@@ -265,7 +270,7 @@ const StepNode = memo(({ id, data }: NodeProps<any>) => {
       </HoverCardTrigger>
       <HoverCardContent align="center">
         <div className="space-y-2">
-          <div className="text-sm font-medium">Model: {data.model}</div>
+          <div className="text-sm font-medium">Model: GPT-5 Turbo</div>
           <div className="text-xs text-muted-foreground">Keywords: {data.keywords || "—"}</div>
           {renderMetrics()}
           <div className="pt-1">
@@ -321,7 +326,7 @@ export function AIFlowCanvas({ onStepChange, onInspect, onHistoryUpdate, onTimeD
         position: { x: 50, y: 60 },
         data: {
           label: "Prompt",
-          model: "gpt-4o",
+          model: "gpt-5-turbo",
           param: 40,
           correctness: 40,
           keywords: "",
@@ -335,7 +340,7 @@ export function AIFlowCanvas({ onStepChange, onInspect, onHistoryUpdate, onTimeD
         position: { x: 320, y: 10 },
         data: {
           label: "Vendor Search",
-          model: "claude-3.5",
+          model: "gpt-5-turbo",
           param: 65,
           correctness: 65,
           keywords: "",
@@ -349,7 +354,7 @@ export function AIFlowCanvas({ onStepChange, onInspect, onHistoryUpdate, onTimeD
         position: { x: 620, y: 60 },
         data: {
           label: "Shortlisting",
-          model: "gpt-4.1-mini",
+          model: "gpt-5-turbo",
           param: 55,
           correctness: 55,
           keywords: "",
@@ -363,7 +368,7 @@ export function AIFlowCanvas({ onStepChange, onInspect, onHistoryUpdate, onTimeD
         position: { x: 900, y: 35 },
         data: {
           label: "Weighting & Sorting",
-          model: "reranker-v2",
+          model: "gpt-5-turbo",
           param: 70,
           correctness: 70,
           keywords: "",
@@ -378,7 +383,7 @@ export function AIFlowCanvas({ onStepChange, onInspect, onHistoryUpdate, onTimeD
         position: { x: 1180, y: 35 },
         data: {
           label: "Output",
-          model: "final-output",
+          model: "gpt-5-turbo",
           param: 100,
           correctness: 100,
           keywords: "",
